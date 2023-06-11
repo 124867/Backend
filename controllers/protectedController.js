@@ -1,9 +1,8 @@
 /* the protectedController handles the protected endpoints (/public and /charity-worker-only).
  */
-
 const express = require('express');
 const jwt = require('jsonwebtoken');
-  
+
 const router = express.Router();
 
 const secretKey = 'mysecretkey';
@@ -20,16 +19,24 @@ function authenticateToken(req, res, next) {
   });
 }
 
-router.get('/charity-worker-only', authenticateToken, (req, res) => {
-  if (req.user.role === 'charity-worker') {
-    res.send('Welcome, charity worker!');
+// User-only route
+router.get('/user/profile', authenticateToken, (req, res) => {
+  if (req.user.role === 'user') {
+    res.send('Welcome, User!');
+    // Add user-specific logic here
   } else {
     res.status(403).send('Access denied.');
   }
 });
 
-router.get('/public', (req, res) => {
-  res.send('Welcome, public user!');
+// Charity worker-only route
+router.get('/charity-worker/profile', authenticateToken, (req, res) => {
+  if (req.user.role === 'charity-worker') {
+    res.send('Welcome, Charity worker!');
+    // Add charity worker-specific logic here
+  } else {
+    res.status(403).send('Access denied.');
+  }
 });
 
 module.exports = router;
