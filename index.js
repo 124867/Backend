@@ -47,10 +47,10 @@ const mongoose = require('mongoose');
 const path = require('path');
 const fileUpload = require("express-fileupload");
 
-const authController = require('./controllers/authController');
-const userController = require('./controllers/userController');
-const charityWorkerController = require('./controllers/charityWorkerController');
 const CatsRouter = require("./route/CatRoute");
+const userRoute = require('./route/userRoute');
+const workerRoute = require('./route/workerRoute');
+/* const homeRoute = require('./route/homeRoute'); */
 
 const app = express();
 app.use(express.json());
@@ -66,21 +66,16 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to database'))
   .catch(err => console.error(err));
 
-app.use('/auth', authController);
+app.use('/user', userRoute);
 
-// User routes
-app.get('/user/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-app.use('/user', userController);
-
-// Charity worker routes
-app.get('/charity-worker/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-app.use('/charity-worker', charityWorkerController);
+app.use('/charity-worker', workerRoute);
 
 app.use("/cats", CatsRouter);
+
+app.get('/cats', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cat.html'));
+});
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 

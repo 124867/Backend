@@ -1,14 +1,31 @@
-const express = require('express');
-const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../model/userModel');
+const path = require('path');
 
-// Login route
-router.post('/login', (req, res) => {
-  // Handle charity worker login here
-});
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
 
-// Charity worker profile route
-router.get('/profile', (req, res) => {
-  // Handle charity worker profile here
-});
+  try {
+    const user = await User.findOne({ email });
 
-module.exports = router;
+    if (!user) {
+      return res.status(401).send('User not found.');
+    }
+
+    const result = await bcrypt.compare(password, user.password);
+
+    if (!result) {
+      return res.status(401).send('Incorrect password.');
+    }
+
+    const token = jwt.sign({ email, role: user.role }, 'igotoschoolbus');
+    if (user.role === 'user') {
+      return res.redirect(`/user/home?token=${token}`);
+    } else if (user.role === 'charity-worker') {
+      return res.redirect(`/charity-worker/home?token=${token}`);
+    }
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
