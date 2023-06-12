@@ -3,7 +3,9 @@ const router = express.Router();
 const charityWorkerController = require('../controllers/charityWorkerController');
 const path = require('path');
 
-const authenticateToken = require('../middleware/authenticateToken');
+const {authenticateToken} = require('../middleware/authenticateToken');
+
+/* worker login */
 
 router.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));

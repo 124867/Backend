@@ -58,7 +58,7 @@ exports.favourites = async (req, res) => {
 exports.removeFromFavorites = async (req, res) => {
   const catId = req.params.catId;
   const token = req.query.token;
-  const decodedToken = jwt.verify(token, 'secret_key');
+  const decodedToken = jwt.verify(token, 'igotoschoolbybus');
   const userEmail = decodedToken.email;
 
   try {
@@ -88,6 +88,7 @@ exports.removeFromFavorites = async (req, res) => {
     return res.status(500).send(err);
   }
 };
+
 
 exports.addToFavorites = async (req, res) => {
   const catId = req.params.catId;
