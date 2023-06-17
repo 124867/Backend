@@ -21,4 +21,6 @@ const directMessageSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('DirectMessage', directMessageSchema);
+const DirectMessage = mongoose.model('directmessages', directMessageSchema);
+
+module.exports = DirectMessage;

@@ -1,13 +1,10 @@
 const DirectMessage = require('../model/DirectMessage');
 const Cat = require('../model/catsModel');
 const User = require('../model/userModel');
-
-const DirectMessage = require('../model/DirectMessage');
-const Cat = require('../model/catsModel');
-const User = require('../model/userModel');
+const jwt = require('jsonwebtoken');
 
 exports.sendDirectMessage = async (req, res) => {
-  const { catId } = req.params.catId;
+  const { catId } = req.params;
   const token = req.query.token; // Retrieve JWT token from authorization header
   const { message } = req.body;
 
@@ -50,11 +47,41 @@ exports.getDirectMessagesForCat = async (req, res) => {
   const { catId } = req.params;
 
   try {
-    // Find all direct messages for the specified cat ID
-    const messages = await DirectMessage.find({ catId }).populate('userId');
+    // Find all direct messages for the specified cat ID, and join the associated cat and user documents
+    const messages = await DirectMessage.find({ catId })
+      .populate({
+        path: 'userId',
+        select: 'email',
+        model: User,
+      })
+      .populate({
+        path: 'catId',
+        model: Cat,
+      });
 
-    // Return the messages as JSON
+    // Return the messages as JSON with the associated cat and user documents included
     return res.json(messages);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+};
+
+exports.deleteDirectMessage = async (req, res) => {
+  const { messageId } = req.params;
+
+  try {
+    // Find the direct message to be deleted and check if it belongs to the user
+    const message = await DirectMessage.findById(messageId);
+    if (!message) {
+      // If the message isn't found, return a 404 error
+      return res.status(404).json({ message: 'Could not find the requested message' });
+    }
+    // Delete the message from the database
+    await DirectMessage.findByIdAndDelete(messageId);
+
+    // Return a success response
+    return res.status(200).json({ message: 'Direct message deleted successfully' });
   } catch (err) {
     console.error(err);
     return res.status(500).send(err);

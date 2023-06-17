@@ -93,7 +93,7 @@ exports.removeFromFavorites = async (req, res) => {
 exports.addToFavorites = async (req, res) => {
   const catId = req.params.catId;
   const token = req.query.token;
-  
+
   try {
     // Verify the JWT token and extract user email
     const decodedToken = jwt.verify(token, 'igotoschoolbybus');
@@ -133,25 +133,21 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).send('User not found.');
+      return res.status(401).json({ error: 'User not found.' });
     }
 
     const result = await bcrypt.compare(password, user.password);
 
     if (!result) {
-      return res.status(401).send('Incorrect password.');
+      return res.status(401).json({ error: 'Incorrect password.' });
     }
 
     const secret = 'igotoschoolbybus';
     const token = jwt.sign({ email, role: user.role }, secret, { algorithm: 'HS256' });
 
-    if (user.role === 'user') {
-      return res.redirect(`/user/home?token=${token}`);
-    } else if (user.role === 'charity-worker') {
-      return res.redirect(`/charity-worker/home?token=${token}`);
-    }
+    return res.status(200).json({ token });
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).json({ error: error.message });
   }
 };
 exports.home = (req, res) => {

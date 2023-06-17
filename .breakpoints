@@ -1,11 +1,27 @@
 {
   "files": {
+    "middleware/passport.js": [
+      {
+        "id": "0b5b3611-f99a-40b0-87ff-ab8b9ddc941a",
+        "line": 1,
+        "version": 72,
+        "index": 0
+      }
+    ],
     "public/index.html": [
       {
         "id": "0398909a-dae9-450d-a581-b9ae0b7344e7",
         "line": 1,
         "version": 643,
         "index": 0
+      }
+    ],
+    "route/CatRoute.js": [
+      {
+        "id": "b9adab58-2d05-48a0-a184-7c974fa40765",
+        "line": 20,
+        "version": 443,
+        "index": 499
       }
     ]
   }
