@@ -2,12 +2,47 @@ const express = require('express');
 const router = express.Router();
 const Cats = require('../controllers/CatController');
 const { authenticateToken, authenticateWorker } = require('../middleware/authenticateToken');
+/** 
+* @openapi
+* tags:
+ *   name: Cats
+ *   description: The Cats managing API
+*/
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Cats:
+ *       type: object
+ *       required:
+ *         - name
+ *         - age
+ *         - breed
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the cat
+ *         image:
+ *           type: string
+ *           description: The URL of the cat's image
+ *         name:
+ *           type: string
+ *           description: The name of the cat
+ *         age:
+ *           type: integer
+ *           description: The age of the cat
+ *         breed:
+ *           type: string
+ *           description: The breed of the cat
+ */
 
 /**
  * @openapi
  * 
  * /cats/upload:
  *   post:
+ *     tags: [Cats]
  *     summary: Upload information about a cat
  *     security:
  *       - bearerAuth: []
@@ -43,6 +78,7 @@ router.post('/upload', authenticateWorker, Cats.upload);
  * 
  * /cats/list:
  *   get:
+ *     tags: [Cats]
  *     summary: Get information about all cats
  *     responses:
  *       '200':
@@ -57,6 +93,7 @@ router.get('/list', Cats.list);
  * 
  * /cats/{id}:
  *   delete:
+ *     tags: [Cats]
  *     summary: Delete information about a cat with the specified ID
  *     security:
  *       - bearerAuth: []
@@ -78,6 +115,7 @@ router.delete('/:id', authenticateWorker, Cats.delete);
  * 
  * /cats/{id}:
  *   put:
+ *     tags: [Cats]
  *     summary: Update information about a cat with the specified ID
  *     security:
  *       - bearerAuth: []
@@ -118,6 +156,7 @@ router.put('/:id', authenticateWorker, Cats.update);
  * 
  * /cats/{catId}:
  *   get:
+ *     tags: [Cats]
  *     summary: Get information about a cat with the specified ID
  *     parameters:
  *       - name: catId
@@ -137,6 +176,7 @@ router.get('/:catId', Cats.get);
  * 
  * /cats/cat-images/{breed}:
  *   get:
+ *     tags: [Cats]
  *     summary: Get a random image of a cat of the specified breed
  *     parameters:
  *       - name: breed
