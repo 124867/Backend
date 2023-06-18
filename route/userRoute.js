@@ -7,6 +7,45 @@ const jwt = require('jsonwebtoken');
 
 const { authenticateToken, authenticateWorker } = require('../middleware/authenticateToken');
 const passport = require('../middleware/passport').passport;
+/** 
+* @openapi
+* tags:
+ *   name: Users
+ *   description: The Users managing API
+*/
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated id of the user
+ *         email:
+ *           type: string
+ *           description: The email address of the user
+ *         password:
+ *           type: string
+ *           description: The password of the user
+ *         role:
+ *           type: string
+ *           description: The role of the user
+ *           enum: [user, worker]
+ *           default: user
+ *         favorites:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Cats'
+ *           description: The favorite cats of the user
+ *         googleId:
+ *           type: string
+ *           description: The Google ID of the user
+ */
 
 // User login
 /**
@@ -14,6 +53,7 @@ const passport = require('../middleware/passport').passport;
  * 
  * /login:
  *   post:
+ *     tags: [Users]
  *     summary: User login
  *     requestBody:
  *       required: true
@@ -46,6 +86,7 @@ router.post('/login', userController.login);
  * 
  * /auth/google:
  *   get:
+ *     tags: [Users]
  *     summary: Log in using a Google account
  *     parameters:
  *       - name: redirect_uri
@@ -66,6 +107,7 @@ router.get('/auth/google',
  * 
  * /auth/google/callback:
  *   get:
+ *     tags: [Users]
  *     summary: Google login callback
  *     parameters:
  *       - name: code
@@ -92,6 +134,7 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
  * 
  * /register:
  *   post:
+ *     tags: [Users]
  *     summary: User registration
  *     requestBody:
  *       required: true
@@ -120,6 +163,7 @@ router.post("/register", userController.create);
  * 
  * /favorites:
  *   get:
+ *     tags: [Users]
  *     summary: Get the favorite list of the current user
  *     responses:
  *       '200':
@@ -133,6 +177,7 @@ router.post("/register", userController.create);
  *
  * /favorites/{catId}:
  *   put:
+ *     tags: [Users]
  *     summary: Add the specified cat to the favorites list
  *     parameters:
  *       - name: catId
@@ -146,6 +191,7 @@ router.post("/register", userController.create);
  *         description: Added successfully
  *
  *   delete:
+ *     tags: [Users]
  *     summary: Remove the specified cat from the favorites list
  *     parameters:
  *       - name: catId
@@ -171,6 +217,7 @@ router.delete('/favorites/:catId', authenticateToken, userController.removeFromF
  * 
  * /send-direct-message/{catId}:
  *   post:
+ *     tags: [Users]
  *     summary: Send a direct message to the specified cat
  *     parameters:
  *       - name: catId
@@ -195,6 +242,7 @@ router.delete('/favorites/:catId', authenticateToken, userController.removeFromF
  *
  * /direct-messages/{catId}:
  *   get:
+ *     tags: [Users]
  *     summary: Get all direct message history for the specified cat
  *     parameters:
  *       - name: catId
@@ -222,6 +270,7 @@ router.delete('/favorites/:catId', authenticateToken, userController.removeFromF
  *
  * /messages/{messageId}:
  *   delete:
+ *     tags: [Users]
  *     summary: Delete the specified direct message
  *     parameters:
  *       - name: messageId
