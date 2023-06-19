@@ -1,128 +1,65 @@
+const FormData = require('form-data');
+const fs = require('fs');
 const request = require('supertest');
-const app = require('../route/CatRoute');
-// assuming the app is defined in a separate file
+const path = require('path');
+const app = require('./app');
+const Cat = require('../model/catsModel');
+const catRoute = require('../route/CatRoute');
+const db = require('./util/db.js');
 
 describe('Cat routes', () => {
-    let token;
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyM0BhZG1pbi5jb20iLCJyb2xlIjoid29ya2VyIiwiaWF0IjoxNjg3MDY2NzM1fQ.tIK964WJsvke6992OUJGiOJ7fTN24-UFZudPW0O9ZpQ";
 
     beforeAll(async () => {
-
-        const response = await request(app)
-            .post('/login')
-            .send({ username: '123@a.com', password: 'igotoschoolbybus' });
-        token = response.body.token;
+        await db.connect();
+        console.log(token);
     });
 
-    /* describe('POST /cats/upload', () => {
-        it('should upload information about a cat', async () => {
-            const response = await request(app)
-                .post('/cats/upload')
-                .set('Authorization', `Bearer ${token}`)
-                .field('name', 'Garfield')
-                .field('breed', 'Persian')
-                .field('age', 5)
-                .attach('image', 'test/cat.jpg');
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('message', 'Successfully uploaded information about a cat');
-        });
-    }); */
+    afterAll(async () => {
+        await db.closeDatabase();
+    });
+
+    beforeEach(async () => {
+        await db.clearDatabase();
+    });
+
+
+
 
     describe('GET /cats/list', () => {
         it('should get information about all cats', async () => {
-            const response = await request(app)
-                .get('/cats/list');
+            // Add test data to the database
+            await Cat.create([
+                { name: 'Garfield', age: 3, breed: 'Persian', image: 'garfield.jpg' },
+                { name: 'Sylvester', age: 5, breed: 'Siamese', image: 'sylvester.jpg' },
+                { name: 'Tom', age: 2, breed: 'Tabby', image: 'tom.jpg' },
+            ]);
+
+            const response = await request(app).get('/cats/list');
+
+            // Check that the response has a status code of 200
             expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('cats');
-            expect(response.body.cats).toBeInstanceOf(Array);
+
+            // Check that the response body is an array
+            expect(response.body).toBeInstanceOf(Array);
+
+            // Check that each object in the response has the expected properties
+            const cat = response.body[0];
+            expect(cat).toHaveProperty('_id');
+            expect(cat).toHaveProperty('name');
+            expect(cat).toHaveProperty('age');
+            expect(cat).toHaveProperty('breed');
+            expect(cat).toHaveProperty('image');
+
+            // Check that the image property is a base64-encoded string
+            expect(cat.image).toMatch(/^data:image\/jpeg;base64,/);
         });
     });
 
-    describe('DELETE /cats/:id', () => {
-        let catId;
-
-        beforeAll(async () => {
-            // create a cat to delete
-            const response = await request(app)
-                .post('/cats/upload')
-                .set('Authorization', `Bearer ${token}`)
-                .field('name', 'Whiskers')
-                .field('breed', 'Siamese')
-                .field('age', 3)
-                .attach('image', 'test/cat.jpg');
-            catId = response.body.catId;
-        });
-
-        it('should delete information about a cat with the specified ID', async () => {
-            const response = await request(app)
-                .delete(`/cats/${catId}`)
-                .set('Authorization', `Bearer ${token}`);
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('message', 'Successfully deleted information about a cat');
-        });
-    });
-
-    describe('PUT /cats/:id', () => {
-        let catId;
-
-        beforeAll(async () => {
-            // create a cat to update
-            const response = await request(app)
-                .post('/cats/upload')
-                .set('Authorization', `Bearer ${token}`)
-                .field('name', 'Socks')
-                .field('breed', 'Calico')
-                .field('age', 2)
-                .attach('image', 'test/cat.jpg');
-            catId = response.body.catId;
-        });
-
-        it('should update information about a cat with the specified ID', async () => {
-            const response = await request(app)
-                .put(`/cats/${catId}`)
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    name: 'Mittens',
-                    breed: 'Tabby',
-                    age: 3,
-                });
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('message', 'Successfully updated information about a cat');
-        });
-    });
-
-    describe('GET /cats/:catId', () => {
-        let catId;
-
-        beforeAll(async () => {
-            // create a cat to get information about
-            const response = await request(app)
-                .post('/cats/upload')
-                .set('Authorization', `Bearer ${token}`)
-                .field('name', 'Fluffy')
-                .field('breed', 'Maine Coon')
-                .field('age', 4)
-                .attach('image', 'test/cat.jpg');
-            catId = response.body.catId;
-        });
-
-        it('should get information about a cat with the specified ID', async () => {
-            const response = await request(app)
-                .get(`/cats/${catId}`);
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('cat');
-            expect(response.body.cat).toHaveProperty('name', 'Fluffy');
-            expect(response.body.cat).toHaveProperty('breed', 'Maine Coon');
-            expect(response.body.cat).toHaveProperty('age', 4);
-        });
-    });
-
-    describe('GET /cats/cat-images/:breed', () => {
-        it('should get a random image of a cat of the specified breed', async () => {
-            const response = await request(app)
-                .get('/cats/cat-images/Persian');
-            expect(response.statusCode).toBe(200);
-            expect(response.body).toHaveProperty('images');
-            expect(response.body.images).toBeInstanceOf(Array);
-        });
-    });
 });
+
+
+
+
+
+

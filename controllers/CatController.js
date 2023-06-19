@@ -1,7 +1,7 @@
 const Cat = require("../model/catsModel");
 const fs = require('fs');
 const sharp = require('sharp');
-const fetch = require('node-fetch');
+/* const fetch = require('node-fetch'); */
 const SocialPost = require("social-post-api"); // Install "npm i social-post-api"
 // Live API Key
 const social = new SocialPost("AXYWG3X-QEJMNZK-HW5ZCN2-RBP56NG");
@@ -25,24 +25,25 @@ exports.upload = async (req, res) => {
 
         // Extract the uploaded image file from the request
         const image = req.files.image;
-
+        console.log(req.body);
+        console.log(req.files.image);
         // Upload the image file
         const imagePath = __dirname + '/../images/' + image.name;
         await image.mv(imagePath);
 
-        /* // If breed is not provided, classify the breed from the uploaded image using the Cat API
-        if (!breed) {
-          const apiKey = 'live_9CfIwdJdTj1GcmG0mJOsfmpcn9riz3MPYCI9Pm6TLiimWhLdsieu935MmyiEb1iz';
-          const response = await fetch(`https://api.thecatapi.com/v1/images/upload?api_key=${apiKey}&sub_id=${name}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            body: new FormData().append('file', image.data),
-          });
-          const result = await response.json();
-          console.log(result);
-          breed = result.breeds[0].name;
+        // If breed is not provided, classify the breed from the uploaded image using the Cat API
+        /* if (!breed) {
+            const apiKey = 'live_9CfIwdJdTj1GcmG0mJOsfmpcn9riz3MPYCI9Pm6TLiimWhLdsieu935MmyiEb1iz';
+            const response = await fetch(`https://api.thecatapi.com/v1/images/upload?api_key=${apiKey}&sub_id=${name}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                body: new FormData().append('file', image.data),
+            });
+            const result = await response.json();
+            console.log(result);
+            breed = result.breeds[0].name;
         } */
 
         // Create a new cat document with the uploaded data
@@ -196,7 +197,7 @@ exports.get = async (req, res) => {
 };
 
 
-// Export the controller function to be used in other modules
+/* // Export the controller function to be used in other modules
 exports.getCatImagesByBreed = async (breedName) => {
     const apiKey = 'live_9CfIwdJdTj1GcmG0mJOsfmpcn9riz3MPYCI9Pm6TLiimWhLdsieu935MmyiEb1iz';
     try {
@@ -226,5 +227,5 @@ exports.getCatImagesByBreed = async (breedName) => {
     } catch (err) {
         console.error(err);
         throw new Error('Error retrieving cat images');
-    }
-};
+    } 
+}; */
